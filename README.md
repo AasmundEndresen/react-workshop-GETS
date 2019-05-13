@@ -174,7 +174,7 @@ And then we need to create a stories module.
 
 If we now run the command `npm run storybook` in our terminal, we can see that we have created our first story - and all our values are displayed in a row.  Though ... not in a very nice way since we are outside of the context of a Table.
 
-## Now lets try again
+### Now lets try again
 
 So we need to create out `Table` component.
 Just like the `Row`, we will make our `Table.jsx` in `{root}/components`.
@@ -228,7 +228,7 @@ storiesOf('MCU Avengers!', module)
   .add('Table', () => <Table keys={keys} rows={rows}/>);
 ```
 
-## Making the App
+### Making the App
 
 Now lets connect our mockdata to the table and see if we can run the app - go to the `App.js`-file at `{root}`.  You might remember we removed everything from here earlier?
 
@@ -272,3 +272,193 @@ export default styled(App)`
 `;
 ```
 
+Now we can run `npm run build` and `npm start` to build our app and run it on localhost, and see that our magnificent table is displaying our data.
+
+### But ... this is just static, what about functionality?
+
+Hang on ... we're just getting there.  Lets introduce React Hooks, and Context API.
+These are all a part of the React API, so we can just expand our import without adding any more dependencies.
+
+`import React, { createContext, useContext, useReducer } from 'react'`
+
+Now lets start by creating a Context object and setting our mockdata as the initial state.
+(We should also export this context for later purposes)
+
+We add this code just below the imports in `App.js`, and assign it to `initialState` inside the component.
+```
+...
+// imports above here
+
+export const AppContext = createContext({
+  productData: mock,
+});
+
+const App = ({ className }) => {
+  const initialState = useContext(AppContext);
+...
+```
+
+This also means we should change all our references to `mock` inside the component to now reference `productData`.
+
+We will also wrap our returned component in a `Context.Provider`-component.
+
+```
+return (
+  <AppContext.Provider value={{}}>
+    <div className={className}>
+      <Table headings={headings} rows={rows}>
+    </div>
+  </AppContext.Provider>
+);
+```
+
+The Provider will pass down any props or functions placed within the object in the `value`-attribute to any child components in the DOM-tree that uses `useContext(AppContext)` - this is why we had to export AppContext so we can import it, and pass it as an argument to `useContext()` wherever we need to access its values.
+
+Essentially this provides us with a similar global state management to redux, without adding the extra dependency.
+
+### But why did we import useReducer then?
+
+Aha - but we haven't actually intialised a global state yet, and thats why we have no data to pass down through our provider.
+
+So lets write a reducer, to use with useReducer.  This will be the function we call every time we wish to make changes to the state.
+
+Make a new file `{root}/reducers/AppReducer.js`.
+Also copy this code in to a file `{root}/util/sort.util.js` - we will use it later.
+```
+export const sortByName = (a, b) => {
+  a = a.toLowerCase();
+  b = b.toLowerCase();
+  if (a < b) return -1;
+  if (a > b) return 1;
+  return 0;
+};
+```
+
+Now import our `mock` and `sortByName` into `AppReducer`. Take notice that `sortByName` is a named export, whereas `mock` is a default export.  All named exports must be wrapped in curly braces, whereas default exports should not.
+
+Our `appReducer`-function should take two arguments, the current `state` and the `action` to be performed - also, since the state in this workshop only contains `productData` we can save ourselves some time and immediately deconstruct it.
+
+`let { productData } = state;`
+
+The most common way to write a reducer is to write a switch statement, that will switch based on the type of constant recieved through the `action` object.
+
+```
+switch (action.type) {
+  case 'FILTER': {
+    return { ...state, newState };
+  }
+  case 'SORT': {
+    return { ...state, newState };
+  }
+  case 'DELETE': {
+    return { ...state, newState };
+  }
+  default:
+  return state;
+}
+
+export default appReducer;
+```
+
+Now lets write some simple algorithms to decide how to deal with each type of action.
+
+```
+import mock from '../mockdata';
+import { sortByName } from '../util/sort.util';
+
+const appReducer = (state, action) => {
+  let { productData } = state;
+  switch (action.type) {
+    case 'FILTER': {
+      productData = [ ...productData, ...mock ];
+      productData = productData.filter(product => product[action.target].toLowerCase().includes(action.filter));
+      return { ...state, productData };
+    }
+    case 'SORT': {
+      productData = productData.sort((a, b) => sortByName(a[action.target], b[action.target]));
+      return { ...state, productData };
+    }
+    case 'DELETE': {
+      productData = productData.filter(product => product['ArticleID'] !== action.target);
+      return { ...state, productData };
+    }
+    default:
+      return state;
+  }
+}
+
+export default appReducer;
+```
+
+Reducers can handle much more complex logic, and a much wider array of action types then this - but this is all we need for this workshop.  Also note that our newState that we merge into the state object is our updated array of productData.  Again, this is just done for the convenience of the workshop, but normally this logic would be more abstract to be able to handle more cases.
+
+### ...okay... so we have a reducer?
+
+Now lets use it - head back to our `App.js`.
+
+Beneath our initialisation of the Context, add the following code
+
+```
+const initialState = useContext(AppContext);
+const [{ productData }, dispatch] = useReducer(
+  appReducer,
+  initialState,
+);
+const { Variants, ...rest } = productData[0];
+```
+What we see here is actually `{ productData }` being initialised as the `state` object in our reducer, and `dispatch` as a function to create new actions.
+
+Now if you remember we used more arguments then `action.type` in our reducer, when using the `'SORT'`-constant we used `action.target`.
+
+Lets try to invoke this action on a target - our table headings should be the perfect place.
+`const headings = keys.map(key => <h2 onClick={() => dispatch({ type: 'SORT', target: key })}>{key}</h2>);`
+
+And perhaps we could use a filter to sort through our `SupplierName` values?  Then we need to add a text-input so we can type out what we want to filter by.
+```
+<input placeholder="Seach here" type="text" onChange={e => dispatch({ type: 'FILTER', filter: e.target.value, target: 'SupplierName' })}/>
+        <Table headings={headings} rows={rows}/>
+```
+But we can even pass down our dispatch function and state through the `Context.Provider`.
+
+`<AppContext.Provider value={{ productData, dispatch }}>`
+
+And then if you remember, we can retrieve and use that dispatch function in any child component we want, such as our `Row`.
+
+```
+import React, { useContext } from 'react';
+import styled from 'styled-components';
+import PropTypes from 'prop-types';
+import { AppContext } from '../App';
+
+const Row = ({ className, values }) => {
+  /* Deconstructing our dispatch function from the Context provided in App.js */
+  const { dispatch } = useContext(AppContext);
+  return (
+    <tr className={className}>
+      {values.map((value, index) => <td key={index}>{value}</td>)}
+      <td>
+        <button onClick={() => dispatch({ type: 'DELETE', target: values[0] })}>Delete</button>
+      </td>
+    </tr>
+  );
+};
+
+Row.propTypes = {
+  className: PropTypes.string.isRequired,
+  values: PropTypes.array.isRequired,
+};
+
+export default styled(Row)`
+  width: 100%;
+`;
+```
+
+Now if we try to run `npm run build` and `npm start` - we should find that clicking on a heading will sort our table by that column, typing in a filter will immediately filter the table - and clicking on our tiny new delete button, removes the item.
+
+Now all that's left to do is to add some style, and thats where the styled-components in.
+
+We have added this method `styled` to every export with some tagged template literals following.
+
+In here we can write normal css that will remain local in the component, and by order of specificity will gain presedence.  This is more of a playground then anything, you can find the style I used in my example code or make your own - with one neat exception to regular `scss` - you have access to any prop passed into the component from the parent simply by using e.g. `color: ${props => props.someprop ? 'green' : 'red'};`.
+
+Now play around and see what you can do with what you learned, and feel free to ask questions!

@@ -8,9 +8,7 @@ const Row = ({ className, values }) => {
   const { dispatch } = useContext(AppContext);
   return (
     <tr className={className}>
-      {/* Mapping all the values in the row to individual table cells */}
       {values.map((value, index) => <td key={index}>{value}</td>)}
-      {/* Placing the delete button inside a table cell */}
       <td>
         <button onClick={() => dispatch({ type: 'DELETE', target: values[0] })}>Delete</button>
       </td>
@@ -18,7 +16,6 @@ const Row = ({ className, values }) => {
   );
 };
 
-/* Defining which parameters/props the component will accept, and marking them as required */
 Row.propTypes = {
   className: PropTypes.string.isRequired,
   values: PropTypes.array.isRequired,
