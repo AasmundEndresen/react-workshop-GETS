@@ -228,3 +228,47 @@ storiesOf('MCU Avengers!', module)
   .add('Table', () => <Table keys={keys} rows={rows}/>);
 ```
 
+## Making the App
+
+Now lets connect our mockdata to the table and see if we can run the app - go to the `App.js`-file at `{root}`.  You might remember we removed everything from here earlier?
+
+import `React`, `styled`, `PropTypes`, `Table` and `mock from './mockdata'`.
+
+Since we don't need all the data from the mock for this table, we haven't created any functions to handle nested arrays yet - we will ommit the product variants, for the convenience of this workshop.
+
+We can do this in the scope of our component, but this means we need a return statement to handle our jsx.
+
+```
+import React from 'react';
+import styled from 'styled-components';
+import PropTypes from 'prop-types';
+import mock from './mockdata';
+import Table from './components/Table';
+
+const App = ({ className }) => {
+  const { Variants, ...rest } = mock[0];
+  const keys = Object.keys(rest);
+  const rows = mock.map(row => {
+    const { Variants, ...rest } = row;
+    return Object.values(rest);
+  });
+  const headings = keys.map(key => <h2>{key}</h2>);
+  return (
+    <div className={className}>
+      <Table headings={headings} rows={rows}>
+    </div>
+  );
+};
+
+App.propTypes = {
+  className: PropTypes.string.isRequired,
+};
+
+export default styled(App)`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+`;
+```
+

@@ -17,8 +17,8 @@ const App = ({ className }) => {
   );
   const { Variants, ...rest } = productData[0];
   const keys = Object.keys(rest);
-  const rows = productData.map(eachRow => {
-    const { Variants, ...rest } = eachRow;
+  const rows = productData.map(row => {
+    const { Variants, ...rest } = row;
     return Object.values(rest);
   });
   const headings = keys.map(key => <h2 onClick={() => dispatch({ type: 'SORT', target: key })}>{key}</h2>);
