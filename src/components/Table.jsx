@@ -3,16 +3,14 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import Row from './Row';
 
-const Table = ({ className, keys, rows }) => {
-  return (
-    <table className={className}>
-      <thead><tr>{keys.map((key, index) => <th key={index}>{key}</th>)}<th /></tr></thead>
-      <tbody>
-        {rows.map((row, index) => <Row key={index} values={row}/>)}
-      </tbody>
-    </table>
-  );
-};
+const Table = ({ className, headings, rows }) => (
+  <table className={className}>
+    <thead><tr>{headings.map((heading, index) => <th key={index}>{heading}</th>)}<th /></tr></thead>
+    <tbody>
+      {rows.map((row, index) => <Row key={index} values={row}/>)}
+    </tbody>
+  </table>
+);
 
 Table.propTypes = {
   className: PropTypes.string.isRequired,

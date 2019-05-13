@@ -26,7 +26,7 @@ const App = ({ className }) => {
     <AppContext.Provider value={{ productData, dispatch }}>
       <div className={className}>
         <input placeholder="Seach here" type="text" onChange={e => dispatch({ type: 'FILTER', filter: e.target.value, target: 'SupplierName' })}/>
-        <Table keys={headings} rows={rows}/>
+        <Table headings={headings} rows={rows}/>
       </div>   
     </AppContext.Provider>
   );

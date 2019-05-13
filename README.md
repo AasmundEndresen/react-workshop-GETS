@@ -124,6 +124,7 @@ Then we will make a button to delete products from the table, a feature to sort 
 ### Starting small
 
 Our first task is to create a simple table row from a data input of variable length.  For this task we need to use two of our installed NPM-modules: `React` and `styled-components`.
+Go ahead and create a file `{root}/components/Row.jsx` - the components folder is a part of our design pattern, it is where we will store generic Components that we will likely reuse alot throughout our application. 
 In the ES6 syntax that React uses - we can use the new, improved import statements.
 
 ```
@@ -137,7 +138,7 @@ we have to manually pass this down to the DOM-node unless we are creating a pure
 as opposed to a `styled(Row)` - the className will be available as a prop on the component that is styled.
 
 Lets also make the reasonable assumption that we recieve a 'values' array as a prop, and map these values to each individual
-table cell. 
+table cell.
 
 ```
 import React from 'react';
@@ -159,3 +160,71 @@ export default styled(Row)`
   width: 100%;
 `;
 ```
+
+Once we have created our `Row` component, we should try it out in our storybook to make sure it renders as intended. (Keep in mind that a tr-element is intended to render in the context of a `<table>` or a `<tbody>`).
+
+Head over to `{root}/stories/index.stories.js`.
+Feel free to rip out most of the existing code, the only imports we need are `React`, `storiesOf` and `Row` from `../src/components/Row`.
+
+We also need a simple array to populate our component with, such as: `const values = ['1', '2', '3']`.
+
+And then we need to create a stories module.
+
+`storiesOf('MCU Avengers!', module).add('Table Row', () => <Row values={values}/>)`
+
+If we now run the command `npm run storybook` in our terminal, we can see that we have created our first story - and all our values are displayed in a row.  Though ... not in a very nice way since we are outside of the context of a Table.
+
+## Now lets try again
+
+So we need to create out `Table` component.
+Just like the `Row`, we will make our `Table.jsx` in `{root}/components`.
+Notice that we always name our `.jsx`-files the same as the component.  This is considered good practice in React.
+
+Our table will again make use of `React`, `styled` and `PropTypes` - but we will also use our `Row` component here.
+
+We also want to accept more props in the table - we will require an array of `headings` for all our columns, and an array of `rows` containing all the data we will populate our table with.
+
+```
+import React from 'react';
+import styled from 'styled-components';
+import PropTypes from 'prop-types';
+import Row from './Row';
+
+const Table = ({ className, headings, rows }) => (
+  <table className={className}>
+    <thead><tr>{headings.map((heading, index) => <th key={index}>{heading}</th>)}<th /></tr></thead>
+    <tbody>
+      {rows.map((row, index) => <Row key={index} values={row}/>)}
+    </tbody>
+  </table>
+);
+
+Table.propTypes = {
+  className: PropTypes.string.isRequired,
+  keys: PropTypes.array.isRequired,
+  rows: PropTypes.array.isRequired,
+}
+
+export default styled(Table)`
+  width: 100%;
+  border-spacing: 0;
+`;
+```
+
+We may then update our storybook to show the `Table` we just made.
+
+```
+import React from 'react';
+import { storiesOf } from '@storybook/react';
+import Row from '../src/components/Row';
+import Table from '../src/components/Table';
+
+const keys = ['a', 'b', 'c'];
+const values = ['1', '2', '3'];
+const rows = Array(8).fill(values);
+
+storiesOf('MCU Avengers!', module)
+  .add('Table Row', () => <Row values={values}/>)
+  .add('Table', () => <Table keys={keys} rows={rows}/>);
+```
+
