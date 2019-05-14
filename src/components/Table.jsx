@@ -19,24 +19,31 @@ Table.propTypes = {
 }
 
 export default styled(Table)`
-  width: 100%;
+  max-width: 100%;
   border-spacing: 0;
   th {
-    padding: 20px 10px;
-    border-bottom: 3p solid black;
+    padding: 4px 0px;
+    border-bottom: 2px solid darkslategrey;
     cursor: pointer;
+    h2 {
+      font-family: Helvetica;
+      font-size: 14px;
+      font-weight: bold;
+    }
   }
   td {
-    padding: 10px;
+    padding: 4px 0px;
     text-align: center;
   }
-  thead, tfoot {
-    box-sizing: border-box;
+  thead {
     background-color: lightsteelblue;
   }
   tbody {
     > :nth-child(even) {
       background-color: whitesmoke;
+      &:hover {
+        background-color: lightgray;
+      }
     }
   }
 `;

@@ -23,19 +23,24 @@ Row.propTypes = {
 
 export default styled(Row)`
   width: 100%;
+  font-size: 14px;
+  font-family: 'Trebuchet MS';
+  color: darkslategrey;
+  opacity: 0.8;
   button {
-    display: block;
-    padding: 14px 8px;
-    height: 100%;
-    width: 100%;
-    font-size: 16px;
+    padding: 2px 4px;
+    font-size: 12px;
     border: 2px solid maroon;
     border-radius: 5px;
     background-color: transparent;
     color: maroon;
     cursor: pointer;
     opacity: 0.1;
-    &:hover {
+  }
+  &:hover {
+    background-color: lightgray;
+    opacity: 1;
+    button {
       opacity: 0.8;
     }
   }

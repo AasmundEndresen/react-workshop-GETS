@@ -25,7 +25,7 @@ const App = ({ className }) => {
   return (
     <AppContext.Provider value={{ productData, dispatch }}>
       <div className={className}>
-        <input placeholder="Seach here" type="text" onChange={e => dispatch({ type: 'FILTER', filter: e.target.value, target: 'SupplierName' })}/>
+        <input placeholder="Search here" type="text" onChange={e => dispatch({ type: 'FILTER', filter: e.target.value, target: 'SupplierName' })}/>
         <Table headings={headings} rows={rows}/>
       </div>   
     </AppContext.Provider>
@@ -37,6 +37,7 @@ App.propTypes = {
 };
 
 export default styled(App)`
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -45,7 +46,7 @@ export default styled(App)`
     color: maroon;
   }
   input {
-    font-size: 32px;
+    font-size: 18px;
     padding: 10px;
     margin: 8px;
     border-radius: 3px;
