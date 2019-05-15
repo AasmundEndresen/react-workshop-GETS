@@ -8,6 +8,17 @@ Before starting the workshop you should make sure you have the required dependen
   - Node.js
   - Code editor of your choice (VSCode is great)
 
+```
+Resources:
+
+Styled Components : https://www.styled-components.com
+Polished          : https://polished.js.org/
+React             : https://reactjs.org/docs/getting-started.html
+NodeJS            : https://nodejs.org/en/docs/
+NPM               : https://www.npmjs.com/
+MDN Docs          : https://developer.mozilla.org/en-US/
+```
+
 If you're running Visual Studio Code 1.33.0 or 1.33.1 there is a performance bug with Intellisense.
 To temporarily fix this we can disable the built-in extension "TypeScript and JavaScript Language Features".
 Go to Extensions, and search for '@builtin typescript' to find it.
